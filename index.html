@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniWiki Pública | Enciclopedia web con búsqueda</title>
+    <meta name="description" content="MiniWiki Pública es una enciclopedia web que permite buscar temas y mostrar información desde Wikipedia en español.">
+    <meta name="keywords" content="miniwiki, wiki publica, enciclopedia web, buscar informacion, wikipedia, html, javascript">
+    <meta name="author" content="Geovanny Gabriel">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#f8f9fa">
+    <meta name="application-name" content="MiniWiki">
+    <meta property="og:title" content="MiniWiki Pública">
+    <meta property="og:description" content="Enciclopedia web con búsqueda de información desde Wikipedia en español.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://astonishing-pegasus-60a110.netlify.app/">
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="MiniWiki Pública">
+    <meta name="twitter:description" content="Busca temas y consulta resúmenes desde Wikipedia en español.">
+    <link rel="canonical" href="https://astonishing-pegasus-60a110.netlify.app/">
+    <link rel="search" type="application/opensearchdescription+xml" href="opensearch.xml" title="MiniWiki">
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "MiniWiki Pública",
+            "description": "Enciclopedia web con búsqueda de información desde Wikipedia en español.",
+            "creator": {
+                "@type": "Person",
+                "name": "Geovanny Gabriel"
+            },
+            "inLanguage": "es",
+            "potentialAction": {
+                "@type": "SearchAction",
+                "target": "https://astonishing-pegasus-60a110.netlify.app/index.html?q={search_term_string}",
+                "query-input": "required name=search_term_string"
+            }
+        }
+    </script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Georgia, "Times New Roman", serif;
+            color: #202122;
+            background: #f8f9fa;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 12px 28px;
+            border-bottom: 1px solid #a2a9b1;
+            background: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            border: 1px solid #72777d;
+            border-radius: 50%;
+            font-family: Georgia, "Times New Roman", serif;
+            font-size: 26px;
+            background: #f8f9fa;
+        }
+
+        .search {
+            display: flex;
+            width: min(520px, 100%);
+            border: 1px solid #a2a9b1;
+            background: #ffffff;
+        }
+
+        .search input {
+            flex: 1;
+            min-width: 0;
+            border: 0;
+            padding: 10px;
+            font-size: 15px;
+        }
+
+        .search button {
+            border: 0;
+            border-left: 1px solid #a2a9b1;
+            padding: 0 16px;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .top-links,
+        .page-tabs {
+            display: flex;
+            gap: 14px;
+            font-size: 14px;
+        }
+
+        .top-links a,
+        .page-tabs a,
+        nav a,
+        main a {
+            color: #36c;
+            text-decoration: none;
+        }
+
+        .top-links a:hover,
+        .page-tabs a:hover,
+        nav a:hover,
+        main a:hover {
+            text-decoration: underline;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 230px minmax(0, 1fr) 280px;
+            gap: 24px;
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        nav,
+        aside {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        nav {
+            border-right: 1px solid #eaecf0;
+            padding-right: 18px;
+        }
+
+        nav h2,
+        aside h2 {
+            margin: 0 0 10px;
+            font-size: 15px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 6px;
+        }
+
+        nav a {
+            display: block;
+            padding: 6px 0;
+        }
+
+        main {
+            background: #ffffff;
+            border: 1px solid #a2a9b1;
+            padding: 28px 34px;
+            line-height: 1.65;
+        }
+
+        .page-tabs {
+            justify-content: space-between;
+            margin: -12px 0 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eaecf0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .page-tabs div {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        h1 {
+            margin: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #a2a9b1;
+            font-size: clamp(30px, 5vw, 44px);
+            font-weight: 400;
+        }
+
+        .subtitle {
+            margin: 8px 0 20px;
+            color: #54595d;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .notice,
+        .status {
+            margin: 20px 0;
+            padding: 12px 14px;
+            border: 1px solid #a2a9b1;
+            border-left: 6px solid #36c;
+            background: #f8f9fa;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+        }
+
+        .status.error {
+            border-left-color: #d33;
+        }
+
+        .public-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+            margin: 20px 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .public-box,
+        .result-card {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 14px;
+        }
+
+        .public-box h3,
+        .result-card h3 {
+            margin: 0 0 6px;
+            font-size: 17px;
+        }
+
+        .public-box p,
+        .result-card p {
+            margin: 0;
+            line-height: 1.45;
+        }
+
+        .article-image {
+            float: right;
+            width: min(260px, 42%);
+            margin: 4px 0 16px 20px;
+            border: 1px solid #a2a9b1;
+            background: #ffffff;
+        }
+
+        .article-image img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .article-image figcaption {
+            padding: 8px;
+            color: #54595d;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 12px;
+        }
+
+        .toc {
+            max-width: 320px;
+            margin: 22px 0;
+            padding: 14px 18px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .toc h2 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            border: 0;
+        }
+
+        .toc ol {
+            margin: 0;
+            padding-left: 22px;
+        }
+
+        main h2 {
+            clear: both;
+            margin-top: 28px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #a2a9b1;
+            font-size: 26px;
+            font-weight: 400;
+        }
+
+        .results {
+            display: grid;
+            gap: 12px;
+            margin-top: 14px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .result-card button {
+            margin-top: 10px;
+            border: 1px solid #a2a9b1;
+            padding: 7px 10px;
+            background: #ffffff;
+            color: #36c;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .infobox {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+        }
+
+        .infobox h2 {
+            margin: 0;
+            padding: 10px;
+            border: 0;
+            background: #eaecf0;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .infobox img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: contain;
+            padding: 16px;
+            border-bottom: 1px solid #a2a9b1;
+            background: #ffffff;
+        }
+
+        .infobox table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .infobox th,
+        .infobox td {
+            padding: 8px;
+            border-top: 1px solid #eaecf0;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        footer {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 18px 24px 32px;
+            color: #54595d;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+        }
+
+        @media (max-width: 900px) {
+            header {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .top-links,
+            .page-tabs {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .layout {
+                grid-template-columns: 1fr;
+                padding: 14px;
+            }
+
+            nav {
+                border-right: 0;
+                border-bottom: 1px solid #eaecf0;
+                padding: 0 0 14px;
+            }
+
+            nav a {
+                display: inline-block;
+                margin-right: 14px;
+            }
+
+            main {
+                padding: 22px;
+            }
+
+            .public-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-image {
+                float: none;
+                width: 100%;
+                margin: 16px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="brand">
+            <div class="brand-mark">W</div>
+            <span>MiniWiki</span>
+        </div>
+
+        <form class="search" id="searchForm">
+            <input id="searchInput" type="search" placeholder="Buscar un tema en la web" autocomplete="off">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <div class="top-links">
+            <a href="#crear">Crear cuenta</a>
+            <a href="#acceder">Acceder</a>
+        </div>
+    </header>
+
+    <div class="layout">
+        <nav>
+            <h2>Navegación</h2>
+            <a href="#inicio">Portada</a>
+            <a href="#articulo">Artículo</a>
+            <a href="#resultados">Resultados</a>
+            <a href="#creador">Creador</a>
+            <a href="#referencias">Referencias</a>
+            <a href="#contacto">Contacto</a>
+        </nav>
+
+        <main id="inicio">
+            <div class="page-tabs">
+                <div>
+                    <a href="#articulo">Artículo</a>
+                    <a href="#discusion">Discusión</a>
+                </div>
+                <div>
+                    <a href="#leer">Leer</a>
+                    <a href="#editar">Editar</a>
+                    <a href="#historial">Ver historial</a>
+                </div>
+            </div>
+
+            <h1 id="articleTitle">MiniWiki pública</h1>
+            <p class="subtitle" id="articleSubtitle">Busca cualquier tema y esta página traerá información desde Wikipedia.</p>
+
+            <div class="notice" id="introNotice">
+                Escribe algo en el buscador, por ejemplo: Panamá, Internet, fútbol, HTML, Albert Einstein o inteligencia artificial.
+            </div>
+
+            <section id="articulo">
+                <figure class="article-image" id="articleImage" hidden>
+                    <img id="articleImg" src="" alt="">
+                    <figcaption id="articleCaption"></figcaption>
+                </figure>
+
+                <p id="articleExtract">
+                    <strong>MiniWiki pública</strong> ahora funciona como una enciclopedia conectada a la web.
+                    Cuando hagas una búsqueda, se mostrará aquí un resumen del tema encontrado.
+                </p>
+
+                <p id="articleLink"></p>
+            </section>
+
+            <div class="public-grid">
+                <section class="public-box">
+                    <h3>Búsqueda web</h3>
+                    <p>Consulta temas usando información pública de Wikipedia en español.</p>
+                </section>
+                <section class="public-box">
+                    <h3>Resumen rápido</h3>
+                    <p>Muestra una introducción clara, imagen disponible y enlace para leer más.</p>
+                </section>
+                <section class="public-box">
+                    <h3>Resultados relacionados</h3>
+                    <p>Si el tema no es exacto, aparecen opciones para elegir el artículo correcto.</p>
+                </section>
+                <section class="public-box">
+                    <h3>Sin recargar</h3>
+                    <p>Todo se actualiza dentro de la misma página con JavaScript.</p>
+                </section>
+            </div>
+
+            <div class="toc">
+                <h2>Contenido</h2>
+                <ol>
+                    <li><a href="#articulo">Artículo encontrado</a></li>
+                    <li><a href="#resultados">Resultados de búsqueda</a></li>
+                    <li><a href="#creador">Creador</a></li>
+                    <li><a href="#referencias">Fuente</a></li>
+                </ol>
+            </div>
+
+            <h2 id="resultados">Resultados de búsqueda</h2>
+            <div class="status" id="statusMessage">Todavía no hay búsqueda. Prueba con un tema en la barra superior.</div>
+            <div class="results" id="resultsList"></div>
+
+            <h2 id="creador">Creador</h2>
+            <p>
+                Esta página fue creada por <strong>Geovanny Gabriel</strong>, nacido el <strong>17 de junio de 2009</strong>.
+                Estudia en la escuela pública <strong>Instituto Rubiano</strong>.
+            </p>
+
+            <h2 id="referencias">Fuente</h2>
+            <p>
+                La información se obtiene desde la API pública de
+                <a href="https://www.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>.
+            </p>
+        </main>
+
+        <aside>
+            <section class="infobox">
+                <h2 id="infoTitle">MiniWiki</h2>
+                <img id="infoImage" src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png" alt="Logo tipo wiki">
+                <table>
+                    <tr>
+                        <th>Tipo</th>
+                        <td id="infoType">Enciclopedia pública</td>
+                    </tr>
+                    <tr>
+                        <th>Idioma</th>
+                        <td>Español</td>
+                    </tr>
+                    <tr>
+                        <th>Fuente</th>
+                        <td id="infoSource">Wikipedia</td>
+                    </tr>
+                    <tr>
+                        <th>Creador</th>
+                        <td>Geovanny Gabriel</td>
+                    </tr>
+                    <tr>
+                        <th>Estudios</th>
+                        <td>Instituto Rubiano</td>
+                    </tr>
+                    <tr>
+                        <th>Estado</th>
+                        <td id="infoStatus">Lista para buscar</td>
+                    </tr>
+                </table>
+            </section>
+        </aside>
+    </div>
+
+    <footer id="contacto">
+        Página creada como práctica de HTML, CSS y JavaScript. Necesita conexión a internet para traer resultados.
+    </footer>
+
+    <script>
+        const form = document.querySelector("#searchForm");
+        const input = document.querySelector("#searchInput");
+        const title = document.querySelector("#articleTitle");
+        const subtitle = document.querySelector("#articleSubtitle");
+        const extract = document.querySelector("#articleExtract");
+        const articleLink = document.querySelector("#articleLink");
+        const statusMessage = document.querySelector("#statusMessage");
+        const resultsList = document.querySelector("#resultsList");
+        const articleImage = document.querySelector("#articleImage");
+        const articleImg = document.querySelector("#articleImg");
+        const articleCaption = document.querySelector("#articleCaption");
+        const infoTitle = document.querySelector("#infoTitle");
+        const infoImage = document.querySelector("#infoImage");
+        const infoType = document.querySelector("#infoType");
+        const infoStatus = document.querySelector("#infoStatus");
+
+        const summaryUrl = "https://es.wikipedia.org/api/rest_v1/page/summary/";
+        const searchUrl = "https://es.wikipedia.org/w/api.php?origin=*&action=query&list=search&format=json&srlimit=6&srsearch=";
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+            const query = input.value.trim();
+
+            if (!query) {
+                setStatus("Escribe un tema para buscar.", true);
+                return;
+            }
+
+            updateSearchUrl(query);
+            searchTopic(query);
+        });
+
+        window.addEventListener("DOMContentLoaded", function () {
+            const params = new URLSearchParams(window.location.search);
+            const query = params.get("q");
+
+            if (query) {
+                input.value = query;
+                searchTopic(query);
+            }
+        });
+
+        async function searchTopic(query) {
+            setStatus("Buscando información en la web...");
+            resultsList.innerHTML = "";
+
+            try {
+                const summary = await fetchSummary(query);
+                showArticle(summary);
+                await showRelatedResults(query);
+                setStatus("Búsqueda completada.");
+            } catch (error) {
+                try {
+                    await showRelatedResults(query);
+                    setStatus("No encontré un artículo exacto. Elige uno de los resultados relacionados.", true);
+                } catch (secondError) {
+                    setStatus("No se pudo conectar con Wikipedia. Revisa tu internet e intenta otra vez.", true);
+                }
+            }
+        }
+
+        async function fetchSummary(topic) {
+            const response = await fetch(summaryUrl + encodeURIComponent(topic));
+
+            if (!response.ok) {
+                throw new Error("Artículo no encontrado");
+            }
+
+            return response.json();
+        }
+
+        function showArticle(article) {
+            title.textContent = article.title || "Artículo encontrado";
+            subtitle.textContent = article.description || "Información obtenida desde Wikipedia.";
+            extract.textContent = article.extract || "Este artículo no tiene resumen disponible.";
+            infoTitle.textContent = article.title || "MiniWiki";
+            infoType.textContent = article.description || "Artículo de Wikipedia";
+            infoStatus.textContent = "Artículo cargado";
+
+            if (article.content_urls && article.content_urls.desktop) {
+                articleLink.innerHTML = `<a href="${article.content_urls.desktop.page}" target="_blank" rel="noopener">Leer artículo completo en Wikipedia</a>`;
+            } else {
+                articleLink.textContent = "";
+            }
+
+            if (article.thumbnail && article.thumbnail.source) {
+                articleImg.src = article.thumbnail.source;
+                articleImg.alt = article.title;
+                articleCaption.textContent = article.title;
+                articleImage.hidden = false;
+                infoImage.src = article.thumbnail.source;
+                infoImage.alt = article.title;
+            } else {
+                articleImage.hidden = true;
+                infoImage.src = "https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png";
+                infoImage.alt = "Logo tipo wiki";
+            }
+
+            document.querySelector("#articulo").scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        async function showRelatedResults(query) {
+            const response = await fetch(searchUrl + encodeURIComponent(query));
+
+            if (!response.ok) {
+                throw new Error("Búsqueda no disponible");
+            }
+
+            const data = await response.json();
+            const results = data.query ? data.query.search : [];
+
+            if (results.length === 0) {
+                resultsList.innerHTML = "<p>No hay resultados relacionados.</p>";
+                return;
+            }
+
+            resultsList.innerHTML = results.map(function (item) {
+                return `
+                    <article class="result-card">
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p>${item.snippet}...</p>
+                        <button type="button" data-title="${escapeHtml(item.title)}">Abrir este artículo</button>
+                    </article>
+                `;
+            }).join("");
+
+            resultsList.querySelectorAll("button").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    input.value = button.dataset.title;
+                    updateSearchUrl(button.dataset.title);
+                    searchTopic(button.dataset.title);
+                });
+            });
+        }
+
+        function updateSearchUrl(query) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("q", query);
+            window.history.pushState({}, "", url);
+        }
+
+        function setStatus(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.classList.toggle("error", isError);
+            infoStatus.textContent = isError ? "Revisar búsqueda" : message;
+        }
+
+        function escapeHtml(text) {
+            const element = document.createElement("span");
+            element.textContent = text;
+            return element.innerHTML;
+        }
+    </script>
+</body>
+</html>

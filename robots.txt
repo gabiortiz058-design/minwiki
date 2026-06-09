@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://astonishing-pegasus-60a110.netlify.app/sitemap.xml
