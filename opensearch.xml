@@ -4,5 +4,5 @@
     <Description>Buscar temas en MiniWiki usando información de Wikipedia en español.</Description>
     <InputEncoding>UTF-8</InputEncoding>
     <Image width="16" height="16" type="image/png">https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png</Image>
-    <Url type="text/html" method="get" template="https://astonishing-pegasus-60a110.netlify.app/index.html?q={searchTerms}" />
+    <Url type="text/html" method="get" template="https://gabiortiz058-design.github.io/minwiki/index.html?q={searchTerms}" />
 </OpenSearchDescription>

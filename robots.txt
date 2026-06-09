@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://astonishing-pegasus-60a110.netlify.app/sitemap.xml
+Sitemap: https://gabiortiz058-design.github.io/minwiki/sitemap.xml
