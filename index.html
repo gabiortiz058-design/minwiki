@@ -237,6 +237,102 @@
             line-height: 1.45;
         }
 
+        .public-box button {
+            margin-top: 10px;
+            border: 1px solid #a2a9b1;
+            padding: 7px 10px;
+            background: #ffffff;
+            color: #36c;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .quick-summary-panel {
+            margin: 0 0 22px;
+            padding: 14px;
+            border: 1px solid #a2a9b1;
+            border-left: 6px solid #00af89;
+            background: #ffffff;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .quick-summary-panel h2 {
+            margin-top: 0;
+            border: 0;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .quick-summary-panel p {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .expanded-info {
+            clear: both;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 260px;
+            gap: 20px;
+            margin: 18px 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .detail-panel {
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 14px;
+        }
+
+        .detail-panel h3 {
+            margin: 0 0 10px;
+            font-size: 17px;
+        }
+
+        .article-body {
+            font-family: Georgia, "Times New Roman", serif;
+            line-height: 1.7;
+        }
+
+        .article-body p {
+            margin: 0 0 14px;
+        }
+
+        .quick-facts {
+            display: grid;
+            grid-template-columns: 92px minmax(0, 1fr);
+            gap: 8px 10px;
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .quick-facts dt {
+            color: #54595d;
+            font-weight: 700;
+        }
+
+        .quick-facts dd {
+            margin: 0;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag-list button {
+            border: 1px solid #a2a9b1;
+            padding: 4px 7px;
+            background: #ffffff;
+            color: #36c;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
         .article-image {
             float: right;
             width: min(260px, 42%);
@@ -387,6 +483,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+
             .article-image {
                 float: none;
                 width: 100%;
@@ -458,6 +558,21 @@
                 <p id="articleLink"></p>
             </section>
 
+            <section class="expanded-info" id="expandedInfo" hidden>
+                <h2 id="mas-informacion">Más información</h2>
+                <div class="detail-grid">
+                    <div class="article-body" id="articleBody"></div>
+                    <aside class="detail-panel">
+                        <h3>Datos rápidos</h3>
+                        <dl class="quick-facts" id="quickFacts"></dl>
+                        <div id="categoryBlock" hidden>
+                            <h3>Categorías</h3>
+                            <div class="tag-list" id="categoryList"></div>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
             <div class="public-grid">
                 <section class="public-box">
                     <h3>Búsqueda web</h3>
@@ -465,7 +580,8 @@
                 </section>
                 <section class="public-box">
                     <h3>Resumen rápido</h3>
-                    <p>Muestra una introducción clara, imagen disponible y enlace para leer más.</p>
+                    <p>Genera una explicación corta del artículo que está cargado.</p>
+                    <button type="button" id="quickSummaryButton">Ver resumen rápido</button>
                 </section>
                 <section class="public-box">
                     <h3>Resultados relacionados</h3>
@@ -477,10 +593,16 @@
                 </section>
             </div>
 
+            <section class="quick-summary-panel" id="quickSummaryPanel" hidden>
+                <h2>Resumen rápido</h2>
+                <p id="quickSummaryText"></p>
+            </section>
+
             <div class="toc">
                 <h2>Contenido</h2>
                 <ol>
                     <li><a href="#articulo">Artículo encontrado</a></li>
+                    <li><a href="#mas-informacion">Más información</a></li>
                     <li><a href="#resultados">Resultados de búsqueda</a></li>
                     <li><a href="#creador">Creador</a></li>
                     <li><a href="#referencias">Fuente</a></li>
@@ -499,8 +621,7 @@
 
             <h2 id="referencias">Fuente</h2>
             <p>
-                La información se obtiene desde la API pública de
-                <a href="https://www.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>.
+                La información se obtiene desde la API pública de Wikipedia y se muestra dentro de MiniWiki.
             </p>
         </main>
 
@@ -551,9 +672,17 @@
         const articleLink = document.querySelector("#articleLink");
         const statusMessage = document.querySelector("#statusMessage");
         const resultsList = document.querySelector("#resultsList");
+        const quickSummaryButton = document.querySelector("#quickSummaryButton");
+        const quickSummaryPanel = document.querySelector("#quickSummaryPanel");
+        const quickSummaryText = document.querySelector("#quickSummaryText");
         const articleImage = document.querySelector("#articleImage");
         const articleImg = document.querySelector("#articleImg");
         const articleCaption = document.querySelector("#articleCaption");
+        const expandedInfo = document.querySelector("#expandedInfo");
+        const articleBody = document.querySelector("#articleBody");
+        const quickFacts = document.querySelector("#quickFacts");
+        const categoryBlock = document.querySelector("#categoryBlock");
+        const categoryList = document.querySelector("#categoryList");
         const infoTitle = document.querySelector("#infoTitle");
         const infoImage = document.querySelector("#infoImage");
         const infoType = document.querySelector("#infoType");
@@ -561,6 +690,9 @@
 
         const summaryUrl = "https://es.wikipedia.org/api/rest_v1/page/summary/";
         const searchUrl = "https://es.wikipedia.org/w/api.php?origin=*&action=query&list=search&format=json&srlimit=6&srsearch=";
+        const detailsUrl = "https://es.wikipedia.org/w/api.php?origin=*&action=query&format=json&redirects=1&prop=extracts|info|categories&explaintext=1&exchars=7000&inprop=url&cllimit=8&clshow=!hidden&titles=";
+        let currentArticle = null;
+        let currentDetails = null;
 
         form.addEventListener("submit", function (event) {
             event.preventDefault();
@@ -575,6 +707,10 @@
             searchTopic(query);
         });
 
+        quickSummaryButton.addEventListener("click", function () {
+            showQuickSummary();
+        });
+
         window.addEventListener("DOMContentLoaded", function () {
             const params = new URLSearchParams(window.location.search);
             const query = params.get("q");
@@ -586,18 +722,38 @@
         });
 
         async function searchTopic(query) {
+            const cleanQuery = normalizeSearchQuery(query);
             setStatus("Buscando información en la web...");
             resultsList.innerHTML = "";
+            clearExpandedInfo();
+            clearQuickSummary();
 
             try {
-                const summary = await fetchSummary(query);
-                showArticle(summary);
-                await showRelatedResults(query);
-                setStatus("Búsqueda completada.");
+                const summary = await fetchSummary(cleanQuery);
+                const details = await fetchArticleDetails(summary.title || query).catch(function () {
+                    return null;
+                });
+                showArticle(summary, details);
+                await showRelatedResults(cleanQuery);
+                setStatus(cleanQuery === query ? "Búsqueda completada." : `Búsqueda completada para: ${cleanQuery}`);
             } catch (error) {
                 try {
-                    await showRelatedResults(query);
-                    setStatus("No encontré un artículo exacto. Elige uno de los resultados relacionados.", true);
+                    const results = await fetchSearchResults(cleanQuery);
+
+                    if (results.length > 0) {
+                        const bestTitle = results[0].title;
+                        const summary = await fetchSummary(bestTitle);
+                        const details = await fetchArticleDetails(bestTitle).catch(function () {
+                            return null;
+                        });
+                        showArticle(summary, details);
+                        showRelatedResults(cleanQuery, results);
+                        setStatus(`No había un título exacto, abrí el resultado más cercano: ${bestTitle}.`);
+                        return;
+                    }
+
+                    showRelatedResults(cleanQuery, results);
+                    setStatus("No encontré un artículo exacto. Prueba con otra palabra o una escritura más parecida.", true);
                 } catch (secondError) {
                     setStatus("No se pudo conectar con Wikipedia. Revisa tu internet e intenta otra vez.", true);
                 }
@@ -614,7 +770,29 @@
             return response.json();
         }
 
-        function showArticle(article) {
+        async function fetchArticleDetails(topic) {
+            const response = await fetch(detailsUrl + encodeURIComponent(topic));
+
+            if (!response.ok) {
+                throw new Error("Detalles no disponibles");
+            }
+
+            const data = await response.json();
+            const pages = data.query && data.query.pages ? Object.values(data.query.pages) : [];
+            const page = pages.find(function (item) {
+                return !item.missing;
+            });
+
+            if (!page) {
+                throw new Error("Artículo ampliado no encontrado");
+            }
+
+            return page;
+        }
+
+        function showArticle(article, details = null) {
+            currentArticle = article;
+            currentDetails = details;
             title.textContent = article.title || "Artículo encontrado";
             subtitle.textContent = article.description || "Información obtenida desde Wikipedia.";
             extract.textContent = article.extract || "Este artículo no tiene resumen disponible.";
@@ -622,11 +800,7 @@
             infoType.textContent = article.description || "Artículo de Wikipedia";
             infoStatus.textContent = "Artículo cargado";
 
-            if (article.content_urls && article.content_urls.desktop) {
-                articleLink.innerHTML = `<a href="${article.content_urls.desktop.page}" target="_blank" rel="noopener">Leer artículo completo en Wikipedia</a>`;
-            } else {
-                articleLink.textContent = "";
-            }
+            articleLink.textContent = "La información ampliada aparece más abajo en esta misma página.";
 
             if (article.thumbnail && article.thumbnail.source) {
                 articleImg.src = article.thumbnail.source;
@@ -641,10 +815,118 @@
                 infoImage.alt = "Logo tipo wiki";
             }
 
+            renderExpandedInfo(article, details);
             document.querySelector("#articulo").scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
-        async function showRelatedResults(query) {
+        function showQuickSummary() {
+            if (!currentArticle) {
+                quickSummaryText.textContent = "Primero busca un tema en la barra superior. Luego podrás ver aquí un resumen rápido.";
+                quickSummaryPanel.hidden = false;
+                setStatus("Busca un tema para generar el resumen rápido.", true);
+                quickSummaryPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+            }
+
+            const sourceText = currentArticle.extract || (currentDetails && currentDetails.extract) || "";
+            const summary = buildQuickSummary(sourceText);
+            quickSummaryText.textContent = summary || "No hay suficiente información para crear un resumen rápido de este tema.";
+            quickSummaryPanel.hidden = false;
+            setStatus(`Resumen rápido listo para: ${currentArticle.title}.`);
+            quickSummaryPanel.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        function buildQuickSummary(text) {
+            if (!text) {
+                return "";
+            }
+
+            const sentences = text
+                .replace(/\s+/g, " ")
+                .match(/[^.!?]+[.!?]+/g);
+
+            if (sentences && sentences.length > 0) {
+                return sentences.slice(0, 2).join(" ").trim();
+            }
+
+            return text.replace(/\s+/g, " ").trim().slice(0, 260);
+        }
+
+        function renderExpandedInfo(article, details) {
+            const fullExtract = details && details.extract ? details.extract : article.extract;
+            const paragraphs = splitIntoParagraphs(fullExtract);
+            const categories = details && details.categories
+                ? details.categories.map(function (category) {
+                    return category.title.replace("Categoría:", "");
+                }).filter(Boolean)
+                : [];
+
+            if (paragraphs.length === 0 && categories.length === 0) {
+                clearExpandedInfo();
+                return;
+            }
+
+            articleBody.innerHTML = paragraphs.map(function (paragraph) {
+                return `<p>${escapeHtml(paragraph)}</p>`;
+            }).join("");
+
+            quickFacts.innerHTML = [
+                ["Tema", escapeHtml(article.title || "Sin título")],
+                ["Tipo", escapeHtml(article.description || "Artículo de Wikipedia")],
+                ["Fuente", "Wikipedia en español"],
+                ["Lectura", "Disponible en esta página"]
+            ].map(function (fact) {
+                return `<dt>${escapeHtml(fact[0])}</dt><dd>${fact[1]}</dd>`;
+            }).join("");
+
+            if (categories.length > 0) {
+                categoryList.innerHTML = categories.map(function (category) {
+                    return `<button type="button" data-title="${escapeHtml(category)}">${escapeHtml(category)}</button>`;
+                }).join("");
+                categoryList.querySelectorAll("button").forEach(function (button) {
+                    button.addEventListener("click", function () {
+                        loadInternalTopic(button.dataset.title);
+                    });
+                });
+                categoryBlock.hidden = false;
+            } else {
+                categoryList.innerHTML = "";
+                categoryBlock.hidden = true;
+            }
+
+            expandedInfo.hidden = false;
+        }
+
+        function splitIntoParagraphs(text) {
+            if (!text) {
+                return [];
+            }
+
+            return text
+                .split(/\n{2,}/)
+                .map(function (paragraph) {
+                    return paragraph.replace(/\s+/g, " ").trim();
+                })
+                .filter(function (paragraph) {
+                    return paragraph.length > 50;
+                })
+                .slice(0, 7);
+        }
+
+        function clearExpandedInfo() {
+            articleBody.innerHTML = "";
+            quickFacts.innerHTML = "";
+            categoryList.innerHTML = "";
+            categoryBlock.hidden = true;
+            expandedInfo.hidden = true;
+        }
+
+        function clearQuickSummary() {
+            quickSummaryText.textContent = "";
+            quickSummaryPanel.hidden = true;
+        }
+
+        async function fetchSearchResults(query) {
             const response = await fetch(searchUrl + encodeURIComponent(query));
 
             if (!response.ok) {
@@ -652,7 +934,11 @@
             }
 
             const data = await response.json();
-            const results = data.query ? data.query.search : [];
+            return data.query ? data.query.search : [];
+        }
+
+        async function showRelatedResults(query, existingResults = null) {
+            const results = existingResults || await fetchSearchResults(query);
 
             if (results.length === 0) {
                 resultsList.innerHTML = "<p>No hay resultados relacionados.</p>";
@@ -663,7 +949,7 @@
                 return `
                     <article class="result-card">
                         <h3>${escapeHtml(item.title)}</h3>
-                        <p>${item.snippet}...</p>
+                        <p>${escapeHtml(stripHtml(item.snippet))}...</p>
                         <button type="button" data-title="${escapeHtml(item.title)}">Abrir este artículo</button>
                     </article>
                 `;
@@ -671,11 +957,52 @@
 
             resultsList.querySelectorAll("button").forEach(function (button) {
                 button.addEventListener("click", function () {
-                    input.value = button.dataset.title;
-                    updateSearchUrl(button.dataset.title);
-                    searchTopic(button.dataset.title);
+                    loadInternalTopic(button.dataset.title);
                 });
             });
+        }
+
+        function loadInternalTopic(topic) {
+            input.value = topic;
+            updateSearchUrl(topic);
+            searchTopic(topic);
+        }
+
+        function normalizeSearchQuery(query) {
+            const corrections = {
+                trigronometria: "trigonometría",
+                trigronometría: "trigonometría",
+                trignometria: "trigonometría",
+                trignometría: "trigonometría",
+                trigonometria: "trigonometría",
+                mateticas: "matemáticas",
+                matematica: "matemáticas",
+                matematicas: "matemáticas",
+                fisica: "física",
+                quimica: "química",
+                biologia: "biología",
+                tecnologia: "tecnología",
+                informatica: "informática"
+            };
+
+            let cleanQuery = query
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/[¿?¡!.,;:()"]/g, " ")
+                .replace(/\b(q|que)\s+(es|son|significa|significan)\b/g, " ")
+                .replace(/\b(quien|quienes|donde|cuando|como|cual|cuales|cuanto|cuantos)\s+(es|son|esta|estan|fue|fueron)?\b/g, " ")
+                .replace(/\b(el|la|los|las|un|una|unos|unas|de|del|sobre|acerca|info|informacion)\b/g, " ")
+                .replace(/\s+/g, " ")
+                .trim();
+
+            cleanQuery = corrections[cleanQuery] || cleanQuery;
+
+            Object.keys(corrections).forEach(function (wrongWord) {
+                cleanQuery = cleanQuery.replace(new RegExp(`\\b${wrongWord}\\b`, "g"), corrections[wrongWord]);
+            });
+
+            return cleanQuery || query.trim();
         }
 
         function updateSearchUrl(query) {
@@ -694,6 +1021,12 @@
             const element = document.createElement("span");
             element.textContent = text;
             return element.innerHTML;
+        }
+
+        function stripHtml(text) {
+            const element = document.createElement("span");
+            element.innerHTML = text || "";
+            return element.textContent || element.innerText || "";
         }
     </script>
 </body>
